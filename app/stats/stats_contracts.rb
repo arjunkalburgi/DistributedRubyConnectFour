@@ -1,0 +1,3 @@
+module StatsContracts
+
+end
