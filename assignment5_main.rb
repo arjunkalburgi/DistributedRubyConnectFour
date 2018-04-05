@@ -7,10 +7,22 @@
 #     Andrew McKernan
 #     Arjun Kalburgi
 
-# ConnectFour Application
+# Distributed ConnectFour Application
+require 'set'
 
-# game_driver.rb is the CLI way to run the application
-# require_relative './app/game_driver'
+print "What are you trying to spin up? (client, server, exit)? "
+user_input = gets.chomp
 
-# driver.rb is the GUI way to run the application
-require_relative './app/driver'
+while not Set["client","server","exit"].include? user_input
+    print "What are you trying to spin up? (client, server, exit)? "
+    user_input = gets.chomp
+end 
+
+case user_input
+when "client"
+    require_relative './app/client/client_driver'
+when "server"
+    require_relative './app/server/server_driver'
+else 
+    raise "This is impossible."
+end 
