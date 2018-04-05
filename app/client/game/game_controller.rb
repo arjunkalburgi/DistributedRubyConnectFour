@@ -66,16 +66,12 @@ class GameController
             p1 = Player.new(name1, red_yellow[0])
             if num_players == "1"
                 p2 = AIOpponent.new(name2, red_yellow[1], 3)
-            else 
-                p2 = Player.new(name2, red_yellow[1])
             end
             token_limitations = false
         else
             p1 = Player.new(name1, otto_toot[0], available_tokens.clone) 
             if num_players == "1"
                 p2 = AIOpponent.new(name2, otto_toot[1], 3, available_tokens.clone)
-            else
-                p2 = Player.new(name2, otto_toot[1], available_tokens.clone)
             end
             token_limitations = true
         end
