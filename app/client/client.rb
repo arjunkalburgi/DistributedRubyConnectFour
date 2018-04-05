@@ -1,7 +1,7 @@
 require_relative './client_contracts'
-require_relative './game/game'
+require_relative './game/game_controller'
 
-class Client < Game
+class Client < GameController
     include ClientContracts    
 
 end

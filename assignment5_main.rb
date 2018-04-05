@@ -24,5 +24,5 @@ when "client"
 when "server"
     require_relative './app/server/server_driver'
 else 
-    raise "This is impossible."
+    puts "Goodbye"
 end 
