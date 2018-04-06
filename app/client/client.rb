@@ -2,8 +2,24 @@ require_relative './client_contracts'
 require_relative './game/game_controller'
 
 class Client < GameController
-    include ClientContracts    
+    include ClientContracts   
 
+    def connect_with_server 
+        invariant 
+        pre_connect_with_server
+
+        post_connect_with_server
+        invariant
+    end 
+
+    def join_game_room
+        invariant 
+        pre_join_game_room
+
+        post_join_game_room
+        invariant
+    end 
+    
     def setup_game(rows, columns, type, num_players, player_names)
         invariant 
         pre_setup_game

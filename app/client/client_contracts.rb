@@ -8,6 +8,18 @@ module ClientContracts
         end 
     end 
 
+    def pre_connect_with_server
+    end 
+
+    def post_connect_with_server
+    end 
+
+    def pre_join_game_room
+    end 
+
+    def post_join_game_room
+    end 
+
     def pre_setup_game
         if @gametype is :distributed
             # ensure 
