@@ -34,6 +34,7 @@ class GUI
         @game_window.signal_connect("destroy") {Gtk.main_quit}
         @game_window.title = "Game"
         @game_window.set_position(Gtk::WindowPosition::CENTER)
+	@game_box.override_background_color(:normal, Gdk::RGBA::new(0,0.4,1,0.5))
 
         @type = builder.get_object("GameTypes")
         @num_players = builder.get_object("NumberPlayers")
