@@ -1,21 +1,39 @@
 require_relative './room_contracts'
+require_relative '.../client/game/game/game'
 class Room
     include RoomContracts
 
     def initialize(num_players=2)
         @players = Array.new(num_players)
+        @num_players = num_players
     end
-
-    def setup_game(game)
-        invariant 
-        pre_setup_game(game)
-
-        # game isn't really used for game mechanics
-        # but more for game info (stats)
-        @game = game
-
-        post_setup_game
-        invariant
+    
+    def get_game_info()
+		invariant
+		pre_get_game_info()
+		# query both players as to what game type they want, create a
+		# game object and then return it
+		# TODO: set game to real game object
+		game = nil
+		post_get_game_info(game)
+		invariant
+		return game
+    end
+    
+    def add_player(player)
+		invariant
+		pre_add_player(player)
+		if @players.length == @num_players
+			# trying to join a full room, tell them no and then kick em out
+		end
+		@players << player
+		if @players.length == @num_players
+			# room is now full, query players as to the game type they want
+			@game = get_game_info()
+			setup_game(game)
+		end
+		post_add_player()
+		invariant
     end
 
     def end_game_free_room
@@ -29,6 +47,7 @@ class Room
         @game = nil 
         
         post_end_game_free_room
+        invariant
     end
 
     def is_full? 

@@ -1,3 +1,5 @@
+require_relative '.../client/game/player/player'
+require_relative '.../client/game/game/game'
 module RoomContracts
 
     def invariant
@@ -11,13 +13,21 @@ module RoomContracts
         # no Contracts
 	end 
 
+	def pre_get_game_info
 	
-    def pre_setup_game(game)
-        raise "RoomError, game must be a Game" unless game.is_a? Game 
-    end 
-    def post_setup_game
-        # no Contracts
-    end 
+	end
+	
+	def post_get_game_info(game)
+		raise "Game object was not properly initialized" unless game.is_a? Game 
+	end
+	
+	def pre_add_player(player)
+		raise "Can only add players to room" unless player.is_a? Player
+	end
+	
+	def post_add_player()
+		
+	end
 
 
     def pre_end_game_free_room

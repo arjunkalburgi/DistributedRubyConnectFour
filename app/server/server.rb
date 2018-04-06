@@ -3,9 +3,10 @@ require_relative './GameRoom/room'
 
 class Server 
     include ServerContracts    
-
+    
+    
     def initialize(host, user, pwd, db, port, number_of_rooms=5)
-        pre_initialize(host, user, pwd, db, port)
+        pre_initialize(host, user, pwd, db, port, number_of_rooms)
 
         @rooms = Array.new(number_of_rooms, Room.new)
 
@@ -19,7 +20,6 @@ class Server
         rescue Mysql::Error => e
             puts e.error
         end
-
         post_initialize
         invariant
     end
