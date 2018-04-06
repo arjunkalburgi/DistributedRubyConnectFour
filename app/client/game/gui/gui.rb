@@ -9,7 +9,7 @@ class GUI
         #pre_initialize
         #invariant
 		
-		@controller = controller
+	@controller = controller
         set_constants
         show_start_menu
         
@@ -21,11 +21,11 @@ class GUI
         menu_glade = "#{File.expand_path(File.dirname(__FILE__))}/menuLayout.glade"
         game_layout = "#{File.expand_path(File.dirname(__FILE__))}/gameLayout.glade"
 
-		builder = Gtk::Builder.new(:file => menu_glade)
+	builder = Gtk::Builder.new(:file => menu_glade)
         game_builder = Gtk::Builder.new(:file => game_layout)
 		
-		@window = builder.get_object("menuWindow")
-		@window.signal_connect("destroy") {Gtk.main_quit}
+	@window = builder.get_object("menuWindow")
+	@window.signal_connect("destroy") {Gtk.main_quit}
         @window.title = "Connect4"
         @window.set_position(Gtk::WindowPosition::CENTER)
 
@@ -46,15 +46,15 @@ class GUI
         quitButton = builder.get_object("QuitButton")
         quitButton.signal_connect("clicked") {Gtk.main_quit}
 
-		startButton = builder.get_object("StartButton")
-		startButton.signal_connect("clicked") {generate_board}
+	startButton = builder.get_object("StartButton")
+	startButton.signal_connect("clicked") {generate_board}
 		
         @window.show_all
         Gtk.main
     end
     
     def generate_board
-		v_box = Gtk::Box.new(:vertical)
+	v_box = Gtk::Box.new(:vertical)
 
         @rows = @rowsObject.value_as_int
         @columns = @columnsObject.value_as_int
@@ -99,7 +99,7 @@ class GUI
             button.signal_connect("clicked") {
                 @token ? @controller.column_press(column, @token, self) : @controller.column_press(column, value, self)
             }
-            button_box.pack_start(button)
+            button_box.pack_start(button, :expand => true, :fill => true, :padding => 0)
         }
         return button_box
     end
@@ -108,7 +108,7 @@ class GUI
         h_box = Gtk::Box.new(:horizontal)
         (0..@columns-1).each{|b|
             @images[row_num][b] = Gtk::Image.new(:file => @pictures["E"])
-            h_box.add(@images[row_num][b])
+            h_box.add(@images[row_num][b], :expand => true, :fill => true, :padding => 0)
         }
         return h_box
     end
