@@ -42,7 +42,7 @@ class Client < GameController
         invariant 
         pre_column_press
 
-        if @gametype is :distributed
+        if @gametype == :distributed
             puts "pass to server's column_press"
         else 
             super(column, value, gui)
