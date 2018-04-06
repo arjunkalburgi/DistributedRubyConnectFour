@@ -1,24 +1,44 @@
 require_relative './server_contracts'
+require_relative './GameRoom/room'
+
 class Server 
     include ServerContracts    
 
-    def setup_game(rows, columns, type, num_players, player_names)
-        invariant 
-        pre_setup_game
+    def initialize(number_of_rooms=5)
+        pre_initialize
 
-        puts "server's setup_game"
+        @rooms = Array.new(number_of_rooms, Room.new)
 
-        post_setup_game
+        post_initialize
         invariant
     end
 
-    def column_press(column, value, gui)
+    def join_room(client, room_number)
         invariant 
-        pre_column_press
+        pre_join_room
 
-        puts "server's column_press"
+        room = @rooms[room_number]
 
-        post_column_press
+        if room.is_full?
+            # reject
+        else 
+            # join 
+            if room.is_full? 
+                room.setup_game
+            end 
+        end
+
+        post_join_room
+        invariant 
+    end 
+
+    def take_turn(room_number, game_obj)
+        invariant 
+        pre_take_turn
+
+        puts "update game obj in the specified room"
+
+        post_take_turn
         invariant
     end
 end
