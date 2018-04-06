@@ -1,15 +1,18 @@
 require_relative './room_contracts'
 class Room
-    include RoomContracts    
+    include RoomContracts
 
     def initialize(num_players=2)
+        @players = Array.new(num_players)
     end
-    
-    def setup_game(rows, columns, type, num_players, player_names)
-        invariant 
-        pre_setup_game
 
-        puts "server's setup_game"
+    def setup_game(game)
+        invariant 
+        pre_setup_game(game)
+
+        # game isn't really used for game mechanics
+        # but more for game info (stats)
+        @game = game
 
         post_setup_game
         invariant
@@ -20,13 +23,12 @@ class Room
         pre_end_game_free_room
 
         # record that info in the database
-        # tell players it's ova
         
+        # clear room
         @players = []
         @game = nil 
         
         post_end_game_free_room
-        invariant 
     end
 
     def is_full? 
