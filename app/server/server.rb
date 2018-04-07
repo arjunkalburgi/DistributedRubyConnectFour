@@ -39,7 +39,15 @@ class Server
         invariant 
     end 
 
-        post_join_room
+    def create_room(client, game)
+        invariant 
+        pre_create_room
+
+        room_number = rooms.rindex(nil)
+        room = @rooms[room_number]
+        room = Room.new(game)
+
+        post_enter_room(room_number)
         invariant 
     end 
 
