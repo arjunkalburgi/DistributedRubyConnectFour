@@ -5,18 +5,18 @@ class Server
     include ServerContracts    
     
     
-    def initialize(host, user, pwd, db, port, number_of_rooms=5)
-        pre_initialize(host, user, pwd, db, port, number_of_rooms)
+    def initialize(host, user, password, db, port, number_of_rooms=5)
+        pre_initialize(host, user, password, db, port, number_of_rooms)
 
         @rooms = Array.new(number_of_rooms, nil)
 
         @host = host
         @user = user
-        @pwd = pwd
+        @password = password
         @db = db
         @port = port
         begin
-            @connection = Mysql.new(host, user, pwd, db, port)
+            @connection = Mysql.new(host, user, password, db, port)
         rescue Mysql::Error => e
             puts e.error
         end
