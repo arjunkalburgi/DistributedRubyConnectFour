@@ -23,6 +23,15 @@ module ServerContracts
 	def post_initialize
         raise "Database Error, no db connection" unless !@connection.nil?
 	end 
+ 
+
+	def pre_enter_room(client, room_number, game)
+		raise "Server Error, client must be a client" unless client.is_a? client
+	end 
+	def post_enter_room
+		# no contracts
+	end
+
 
 
 	def pre_join_room(client, room_number)
