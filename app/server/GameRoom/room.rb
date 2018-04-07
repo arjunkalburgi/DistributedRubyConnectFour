@@ -4,7 +4,7 @@ class Room
     include RoomContracts
 
     def initialize(num_players=2)
-        @players = Array.new(num_players)
+        @players = []
         @num_players = num_players
     end
     
@@ -23,8 +23,10 @@ class Room
     def add_player(player)
 		invariant
 		pre_add_player(player)
+		old_len = @players.length
 		if @players.length == @num_players
 			# trying to join a full room, tell them no and then kick em out
+			return
 		end
 		@players << player
 		if @players.length == @num_players
@@ -32,7 +34,7 @@ class Room
 			@game = get_game_info()
 			setup_game(game)
 		end
-		post_add_player()
+		post_add_player(old_len, @players.length)
 		invariant
     end
 
@@ -51,7 +53,11 @@ class Room
     end
 
     def is_full? 
-        @players.length < @num_players
+		invariant
+		pre_is_full
+        @players.length == @num_players
+        post_is_full
+        invariant
     end 
 
 end

@@ -25,8 +25,8 @@ module RoomContracts
 		raise "Can only add players to room" unless player.is_a? Player
 	end
 	
-	def post_add_player()
-		
+	def post_add_player(old_len, new_len)
+		raise "Player not added successfully" unless old_len < new_len
 	end
 
 
