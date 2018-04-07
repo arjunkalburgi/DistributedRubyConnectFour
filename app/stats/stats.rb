@@ -4,17 +4,17 @@ require 'mysql'
 class Stats 
     include StatsContracts    
 
-  def initialize(host, user, pwd, db, port)
+  def initialize(host, username, password, database, port)
     invariant 
-    pre_initialize(host, user, pwd, db, port)
+    pre_initialize(host, username, password, database, port)
 
     @host = host
-    @user = user
-    @pwd = pwd
-    @db = db
+    @username = username
+    @password = password
+    @database = database
     @port = port
     begin
-      @connection = Mysql.new(host, user, pwd, db, port)
+      @connection = Mysql.new(host, username, password, database, port)
     rescue Mysql::Error => e
       puts e.error
     end

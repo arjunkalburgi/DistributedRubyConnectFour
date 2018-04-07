@@ -47,6 +47,7 @@ module ServerContracts
 		raise "ServerError, room at room_number must be a valid room" unless @rooms[rn].is_a? Room
 	end 
 	def post_join_room
+		# no contracts
 	end
 
 

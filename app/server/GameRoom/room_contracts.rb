@@ -14,7 +14,7 @@ module RoomContracts
 	end 
 
 	def pre_get_game_info
-	
+        # no Contracts
 	end
 	
 	def post_get_game_info(game)
