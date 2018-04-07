@@ -1,3 +1,5 @@
+require 'xmlrpc/server'
+require 'xmlrpc/client'
 require_relative './server_contracts'
 require_relative './GameRoom/room'
 
@@ -5,70 +7,82 @@ class Server
     include ServerContracts    
     
     
-    def initialize(host, user, password, db, port, number_of_rooms=5)
-        pre_initialize(host, user, password, db, port, number_of_rooms)
+    def initialize(host, port, number_of_rooms=5)
+        pre_initialize(host, port, number_of_rooms)
 
-        @rooms = Array.new(number_of_rooms, nil)
-
-        @host = host
-        @user = user
-        @password = password
-        @db = db
-        @port = port
-        begin
-            @connection = Mysql.new(host, user, password, db, port)
-        rescue Mysql::Error => e
-            puts e.error
-        end
+        @rooms = Hash.new
+	@clients = Hash.new
+	s = XMLRPC::Server.new(port, hostname, number_of_rooms*2)
+	s.add_handler("handler", self)
+	s.serve
+        
         post_initialize
         invariant
     end
 
-    def enter_room(client, room_number: nil, game: nil)
+    def connect(player, ip_address, port)
         # create (room_number==nil) / join room (room_number!=nil)
         invariant 
-        pre_enter_room(client)
+        pre_connect(player)
 
-        if room_number.nil? 
-            create_room(client, game)
+	c = XMLRPC::Client.new(ip_addr, "/", port)
+	if !@clients.key?(player.player_name)
+		@clients[player.player_name] = c.proxy("client")
+	else
+		return false
+	end
+        post_connect
+        invariant 
+	return true
+    end 
+
+    def enter_room(player, room_id, game: nil)
+	invariant 
+	pre_enter_room(player)
+	if @rooms.key?(room_id)
+	    join_room(player, room_id)
         else
-            join_room(client, room_number)
+	    # load game into game if it exists
+	    # game = loadgame()
+            create_room(player, room_id, game)
         end 
 
         post_enter_room
         invariant 
-    end 
+    end
 
-    def create_room(client, game)
+    def create_room(player, room_id, game)
         invariant 
         pre_create_room
 
-        room_number = rooms.rindex(nil)
-        room = @rooms[room_number]
         room = Room.new(game)
+	room.add_player(player)
+	@rooms[room_id] = room
 
-        post_enter_room(room_number)
+        post_create_room(room_id)
         invariant 
     end 
 
-    def join_room(client, room_number)
+    def join_room(player, room_id)
         invariant
         pre_join_room 
 
-        room = @rooms[room_number]
-        if room.is_full? 
-            # reject, room is full pick another 
-        elsif room.nil? 
-            # reject, must create a room not join a room
+        room = @rooms[room_id]
+        if room.nil? 
+            puts "Room no longer exists - please choose another"
+	    return
+        elsif room.is_full? 
+            puts "Room is full - please choose another"
+	    return
         else
-            # join
+            room.add_player(player)
         end 
 
         post_join_room 
         invariant
     end
 
-    def take_turn(room_number, game_obj)
+    def column_press(room_number, column)
         invariant 
         pre_take_turn(room_number, game_obj)
 

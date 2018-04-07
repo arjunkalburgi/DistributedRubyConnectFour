@@ -1,3 +1,7 @@
+require_relative '../client/game/player/player'
+require_relative '../client/game/game/game'
+require_relative './GameRoom/room'
+
 module ServerContracts
 
 	def invariant
@@ -19,14 +23,14 @@ module ServerContracts
 		# maybe something about socket initalizing? 
 	end 
 	def post_initialize
-        raise "Database Error, no db connection" unless !@connection.nil?
+        	raise "Database Error, no db connection" unless !@connection.nil?
 	end 
  
 
-	def pre_enter_room(client, room_number, game)
-		raise "Server Error, client must be a client" unless client.is_a? client
+	def pre_connect(player)
+		raise "Server Error, player must be a Player" unless player.is_a? Player
 	end 
-	def post_enter_room
+	def post_connect
 		# no contracts
 	end
 
@@ -35,8 +39,8 @@ module ServerContracts
 		raise "ServerError, there are no empty rooms" unless @rooms.rindex(nil) == nil 
 		raise "Input Error, game must be of type Game" unless game.is_a? Game
 	end 
-	def post_create_room(rn)
-		raise "ServerError, Room not created" unless @rooms[rn].is_a? Room
+	def post_create_room(room_id)
+		raise "ServerError, Room not created" unless @rooms[room_id].is_a? Room
 	end
 
 
@@ -49,14 +53,14 @@ module ServerContracts
 	end
 
 
-	def pre_take_turn(room_number, game_obj)
+	def pre_column_press(room_number)
 		# room_number
 		raise "RoomError, Current room must exist within the range of rooms" unless room_number.between?(0, @rooms.size-1)
 
 		# game obj 
-		raise "Server error, game object must be of type Game" unless game_obj.is_a? Game
+		#raise "Server error, game object must be of type Game" unless game_obj.is_a? Game
 	end 
-	def post_take_turn
+	def post_column_press
 		# no contracts
 	end 
 
