@@ -51,6 +51,23 @@ class Server
         invariant 
     end 
 
+    def join_room(client, room_number)
+        invariant
+        pre_join_room 
+
+        room = @rooms[room_number]
+        if room.is_full? 
+            # reject, room is full pick another 
+        elsif room.nil? 
+            # reject, must create a room not join a room
+        else
+            # join
+        end 
+
+        post_join_room 
+        invariant
+    end
+
     def take_turn(room_number, game_obj)
         invariant 
         pre_take_turn(room_number, game_obj)
@@ -63,7 +80,7 @@ class Server
         begin
             game.check_game
         rescue *GameError.GameEnd => gameend
-            room.end_game_free_room
+            room = nil
         end
 
         post_take_turn

@@ -42,13 +42,12 @@ module ServerContracts
 	end
 
 
-	def pre_join_room(client, room_number)
-		# room_number
-		raise "RoomError, Current room must exist within the range of rooms" unless room_number.between?(0, @rooms.size-1)
+	def pre_join_room(client, rn)
+		raise "InputError, room_number must exist within the range of rooms" unless rn.between?(0, @rooms.size-1)
+		raise "ServerError, room at room_number must be a valid room" unless @rooms[rn].is_a? Room
 	end 
 	def post_join_room
-		# no contracts
-	end 
+	end
 
 
 	def pre_take_turn(room_number, game_obj)
