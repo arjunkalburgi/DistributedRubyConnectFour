@@ -27,7 +27,7 @@ class Room
 			# trying to join a full room, tell them no and then kick em out
 		end
 		@players << player
-		if @players.length == @num_players
+		if !@players.include? nil
 			# room is now full, query players as to the game type they want
 			@game = get_game_info()
 			setup_game(game)
