@@ -23,15 +23,31 @@ module ServerContracts
 	def post_initialize
         raise "Database Error, no db connection" unless !@connection.nil?
 	end 
+ 
+
+	def pre_enter_room(client, room_number, game)
+		raise "Server Error, client must be a client" unless client.is_a? client
+	end 
+	def post_enter_room
+		# no contracts
+	end
 
 
-	def pre_join_room(client, room_number)
-		# room_number
-		raise "RoomError, Current room must exist within the range of rooms" unless room_number.between?(0, @rooms.size-1)
+	def pre_create_room(client, game)
+		raise "ServerError, there are no empty rooms" unless @rooms.rindex(nil) == nil 
+		raise "Input Error, game must be of type Game" unless game.is_a? Game
+	end 
+	def post_create_room(rn)
+		raise "ServerError, Room not created" unless @rooms[rn].is_a? Room
+	end
+
+
+	def pre_join_room(client, rn)
+		raise "InputError, room_number must exist within the range of rooms" unless rn.between?(0, @rooms.size-1)
+		raise "ServerError, room at room_number must be a valid room" unless @rooms[rn].is_a? Room
 	end 
 	def post_join_room
-		# no contracts
-	end 
+	end
 
 
 	def pre_take_turn(room_number, game_obj)

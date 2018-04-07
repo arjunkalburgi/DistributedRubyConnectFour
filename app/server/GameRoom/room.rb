@@ -29,7 +29,7 @@ class Room
 			return
 		end
 		@players << player
-		if @players.length == @num_players
+		if !@players.include? nil
 			# room is now full, query players as to the game type they want
 			@game = get_game_info()
 			setup_game(game)
