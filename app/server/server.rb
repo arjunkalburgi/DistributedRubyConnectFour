@@ -11,10 +11,10 @@ class Server
         pre_initialize(host, port, number_of_rooms)
 
         @rooms = Hash.new
-	@clients = Hash.new
-	s = XMLRPC::Server.new(port, hostname, number_of_rooms*2)
-	s.add_handler("handler", self)
-	s.serve
+		@clients = Hash.new
+		s = XMLRPC::Server.new(port, hostname, number_of_rooms*2)
+		s.add_handler("handler", self)
+		s.serve
         
         post_initialize
         invariant
@@ -82,22 +82,42 @@ class Server
         invariant
     end
 
-    def column_press(room_number, column)
+    def column_press(room_id, column, token=nil)
         invariant 
-        pre_take_turn(room_number, game_obj)
+        pre_take_turn(room_id, game_obj)
 
-        room = @rooms[room_number]
-        room.game = game_obj
-        room.players.each { |client| 
-            puts "update all room's players games"
+        room = @rooms[room_id]
+        game_obj = room.game
+		game_obj.play_move(column, token)
+		# update database with new game object
+        room.players.each { |player|
+			#TODO: this
+            #@clients[player.player_name].update_view()
         }
         begin
             game.check_game
         rescue *GameError.GameEnd => gameend
-            room = nil
+            game_over(room_id)
         end
 
         post_take_turn
         invariant
     end
+	
+	def game_over(room_id)
+		#tell clients game is over
+		room = @rooms[room_id]
+		room.players.each { |player|
+			#TODO: this
+            #@clients[player.player_name].end_game()
+        }
+	end
+	
+	def save_game()
+	
+	end
+	
+	def load_game()
+	
+	end
 end
