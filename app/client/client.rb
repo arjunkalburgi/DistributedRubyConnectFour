@@ -58,11 +58,7 @@ class Client < GameController
         invariant 
         pre_column_press
 
-        if @gametype == :distributed
-            puts "pass to server's column_press"
-        else 
-            super(column, value, gui)
-        end 
+        @server.column_press(column, value)
 
         post_column_press
         invariant
@@ -72,16 +68,20 @@ class Client < GameController
 		# set up rules of game? Somehow get this from user?
 	end
 	
-	def exit
-		#end the client session
-	end
-	
 	def update_board
 		# to be called from server with the listener, to update the client view of board
 	end
 	
 	def message
 		# recieve a message from the server?? Idk if needed
+	end
+	
+	def game_over
+		# end the game
+	end
+	
+	def exit
+		#end the client session
 	end
 	
 end

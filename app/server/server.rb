@@ -25,28 +25,27 @@ class Server
         invariant 
         pre_connect(player)
 
-	c = XMLRPC::Client.new(ip_addr, "/", port)
-	if !@clients.key?(player.player_name)
-		@clients[player.player_name] = c.proxy("client")
-	else
-		return false
-	end
-        post_connect
-        invariant 
-	return true
+		c = XMLRPC::Client.new(ip_addr, "/", port)
+		if !@clients.key?(player.player_name)
+			@clients[player.player_name] = c.proxy("client")
+		else
+			return false
+		end
+			post_connect
+			invariant 
+		return true
     end 
 
     def enter_room(player, room_id, game: nil)
-	invariant 
-	pre_enter_room(player)
-	if @rooms.key?(room_id)
-	    join_room(player, room_id)
-        else
-	    # load game into game if it exists
-	    # game = loadgame()
-            create_room(player, room_id, game)
+		invariant 
+		pre_enter_room(player)
+		if @rooms.key?(room_id)
+			join_room(player, room_id)
+			else
+			# load game into game if it exists
+			# game = loadgame()
+			create_room(player, room_id, game)
         end 
-
         post_enter_room
         invariant 
     end
@@ -56,8 +55,8 @@ class Server
         pre_create_room
 
         room = Room.new(game)
-	room.add_player(player)
-	@rooms[room_id] = room
+		room.add_player(player)
+		@rooms[room_id] = room
 
         post_create_room(room_id)
         invariant 
@@ -83,10 +82,8 @@ class Server
     end
 
     def get_room_ids()
-	invariant
-	pre_get_room_ids
-	return @rooms.keys
-    end
+		return @rooms.keys
+	end
 
     def column_press(room_id, column, token=nil)
         invariant 
@@ -97,8 +94,7 @@ class Server
 		game_obj.play_move(column, token)
 		# update database with new game object
         room.players.each { |player|
-			#TODO: this
-            #@clients[player.player_name].update_view()
+			@clients[player.player_name].update_board()
         }
         begin
             game.check_game
@@ -111,12 +107,10 @@ class Server
     end
 	
 	def game_over(room_id)
-		#tell clients game is over
+		#remove room from list of rooms
 		room = @rooms[room_id]
-		room.players.each { |player|
-			#TODO: this
-            #@clients[player.player_name].end_game()
-        }
+		#there is no need to tell the clients, they handle the game 
+		#ending with their version of game
 	end
 	
 	def save_game()
