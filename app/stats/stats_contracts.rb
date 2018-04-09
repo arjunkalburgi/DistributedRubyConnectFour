@@ -27,7 +27,10 @@ module StatsContracts
     end
 
     def post_get_game(result)
-        raise "Database Input Error, result must be String" unless result.is_a String
+        raise "Database Input Error, result must be an array of Games" unless result.is_a? Array
+        result.each { |g|
+            raise "Database Input Error, not all elements of the result were games" unless g.is_a? Game
+        }
     end
 
     def pre_get_player_stats(playername)
