@@ -1,12 +1,10 @@
 module ServerContracts
 
 	def invariant
-		if !@rooms.nil? 
-            raise "RoomError, Rooms must be an array" unless @rooms.kind_of? Array 
-            @rooms.each { |room|
-                raise "RoomError, Each item in the list of rooms must be of the Room class" unless room.is_a? Room 
-            }
-        end
+		raise "RoomError, Rooms must be an array" unless @rooms.kind_of? Array 
+        @rooms.each { |room|
+            raise "RoomError, Each item in the list of rooms must be of the Room class" unless room.is_a? Room 
+        }
 	end 
 
 	def pre_initialize(host, user, pwd, db, port, number_of_rooms)
