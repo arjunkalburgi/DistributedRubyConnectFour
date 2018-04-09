@@ -15,14 +15,11 @@ module StatsContracts
         raise "Database Error, no db connection" !@connection.nil?
     end
 
-    def pre_add_stat(game_id, p1, p2, winner)
-        raise "Database Input Error, input must be String" game_id.is_a?(String)
-        raise "Database Input Error, input must be String" p1.is_a?(String)
-        raise "Database Input Error, input must be String" p2.is_a?(String)
-        raise "Database Input Error, input must be String" winner.is_a?(String)
+    def pre_add_game_to_database(game)
+        raise "Database Input Error, game must of type Game" game.is_a? Game
     end
 
-    def post_add_stat
+    def post_add_game_to_database
         # Stat should be added to database
     end
 

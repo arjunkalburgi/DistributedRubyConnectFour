@@ -8,7 +8,7 @@ require_relative '../player/ai'
 
 class Game 
     include GameContracts
-    attr_reader :players, :board, :current_player_num, :token_limitations
+    attr_reader :players, :board, :current_player_num, :token_limitations, :winner, :is_complete
 
     def initialize(rows=nil, columns=nil, players=nil, token_limitations=false, debug=false)
         pre_init(rows, columns, players)
@@ -16,6 +16,8 @@ class Game
         @observers = []
         @token_limitations = token_limitations
         @debug = debug
+        @winner = "null"
+        @is_complete = 0
         set_game_dimensions(rows, columns)
         set_game_players(players)
 
@@ -105,10 +107,14 @@ class Game
         combinations = @board.get_all_combinations_of_length(current_player.player_win_condition.length)
         @players.each { |p|
             if combinations.include? p.player_win_condition
+                @winner = p.player_name
+                @is_complete = 1
                 raise GameWon.new(p)
             end
         }
         if @board.is_full?
+            @winner = "No winner"
+            @is_complete = 1
             raise NoMoreMoves.new
         end
 

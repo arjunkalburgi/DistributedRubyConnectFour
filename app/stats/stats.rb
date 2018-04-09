@@ -9,6 +9,10 @@ class Stats
 		pre_initialize(host, username, password, database)
 
 		begin
+			host = "localhost"
+			username = "root"
+			password = "password"
+			database = "DistributedRubyConnectFour"
 			@connection = Mysql.new(host, username, password, database, "")
 		rescue Mysql::Error => e
 			puts e.error
@@ -28,15 +32,21 @@ class Stats
 		invariant
 	end
 
-	def add_stat
+	def add_game_to_database(game)
 		invariant 
-		pre_add_stat
+		pre_add_game_to_database(game)
 
-		post_add_stat
+		player1 = g.players[0].player_name 
+		player2 = g.players[1].player_name 
+		serializedgame = Marshal::dump(g)
+		is_complete = g.is_complete
+		winner = g.winner
+		@connection.query("INSERT INTO gamestats (player1, player2, game, is_complete, winner) VALUES ('#{player1}', '#{player2}', '#{serializedgame}', '#{is_complete}', '#{winner}');")
+
+		post_add_game_to_database
 		invariant
 	end
 
-    def enter_room(client, room_number: nil, game: nil)
 	def get_game(player1: nil, player2: nil, game: nil, winner: nil)
 		invariant 
 		pre_get_game
