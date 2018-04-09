@@ -4,16 +4,13 @@ require 'mysql'
 class Stats 
 	include StatsContracts    
 
-	def initialize(host, username, password, database)
+	def initialize(host="localhost", username="root", password="password")
 		invariant 
-		pre_initialize(host, username, password, database)
+		pre_initialize(host, username, password)
 
 		begin
-			host = "localhost"
-			username = "root"
-			password = "password"
 			database = "DistributedRubyConnectFour"
-			@connection = Mysql.new(host, username, password, database, "")
+			@connection = Mysql.new(host, username, password, database)
 		rescue Mysql::Error => e
 			puts e.error
 		end
@@ -77,11 +74,21 @@ class Stats
 		invariant
 	end
 
-	def get_player
+	def get_player_stats(playername)
 		invariant 
-		pre_get_player
+		pre_get_player_stats
 
-		post_get_player
+		number_of_completed_games = @connection.query("select count(*) from gamestats gamestats WHERE is_complete=1 and (player1 = '#{playername}' or player2 = '#{playername}')").first[0].to_i
+		number_of_wins = @connection.query("select count(*) from gamestats gamestats WHERE winner = '#{playername}'").first[0].to_i
+		number_of_incomplete_games = @connection.query("select count(*) from gamestats gamestats WHERE is_complete=0 and (player1 = '#{playername}' or player2 = '#{playername}')").first[0].to_i
+
+		if number_of_completed_games == 0 and number_of_wins == 0 and number_of_incomplete_games == 0
+			puts "#{playername} has not played any games."
+		else 
+			puts "#{playername} has finished #{number_of_completed_games} games and won #{number_of_wins} of them. #{playername} has #{number_of_incomplete_games} games unfinished."
+		end 
+
+		post_get_player_stats
 		invariant
 	end
 
