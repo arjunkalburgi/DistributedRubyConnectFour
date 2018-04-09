@@ -47,9 +47,31 @@ class Stats
 		invariant
 	end
 
-	def get_game(player1: nil, player2: nil, game: nil, winner: nil)
+	def get_game(player1: nil, player2: nil, game: nil, winner: nil, is_complete: nil)
 		invariant 
-		pre_get_game
+		pre_get_game(player1, player2, game, winnerl, is_complete)
+
+		if !game.nil?
+			# search with game
+			get_game(player1: game.players[0].player_name, player2: game.players[1].player_name)
+		elsif !player1.nil? and !player2.nil? 
+			# search with both players
+			@connection.query("select game from gamestats where player1 = '#{player1}' and player2 = '#{player2}' or player1 = '#{player2}' or player2 = '#{player1}';")
+		elsif player1.nil? and player2.nil? and game.nil? and is_complete.nil?
+			# search with winner
+		elsif player2.nil? and game.nil? and winner.nil? and is_complete.nil?
+			# search with player 1
+			@connection.query("select game from gamestats where player1 = '#{player1}' or player2 = '#{player1}';")
+		elsif player1.nil? and game.nil? and winner.nil? and is_complete.nil?
+			# search with player 2
+			@connection.query("select game from gamestats where player1 = '#{player2}' or player2 = '#{player2}';")
+		elsif player1.nil? and player2.nil? and game.nil? and winner.nil?
+			# search with is_complete 
+			@connection.query("select game from gamestats where is_complete = '#{is_complete}';")
+		elsif !(player1.nil? and player2.nil? and winner.nil? and is_complete.nil?)
+			@connection.query("select game from gamestats where winner = '#{winner}' and is_complete = '#{is_complete}' and ((player1 = '#{player1}' and player2 = '#{player2}') or (player1 = '#{player2}' or player2 = '#{player1}'));")
+		# elsif player1.nil? and player2.nil? and game.nil? and winner.nil? and is_complete.nil?
+		end 
 
 		post_get_game
 		invariant
