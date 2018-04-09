@@ -4,13 +4,16 @@ require_relative './game/game_controller'
 class Client < GameController
     include ClientContracts   
 
-    def connect_with_server 
+    attr_reader :available_rooms
+    def connect_with_server(username, ip_address, port)
         invariant 
         pre_connect_with_server
 		
 		s = XMLRPC::Client.new(host, "/", port)
-		@server = s.proxy("manager")
-		#TODO: get username, check if username exists already
+		@server = s.proxy("server")
+		@available_rooms = s.get_room_ids
+		# TODO: connect currently expects a player object, can we pass that in here?
+		while (!s.connect(username, ))
 		
         post_connect_with_server
         invariant

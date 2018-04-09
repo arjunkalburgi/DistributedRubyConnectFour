@@ -82,6 +82,12 @@ class Server
         invariant
     end
 
+    def get_room_ids()
+	invariant
+	pre_get_room_ids
+	return @rooms.keys
+    end
+
     def column_press(room_id, column, token=nil)
         invariant 
         pre_take_turn(room_id, game_obj)
