@@ -7,15 +7,27 @@ class Client < GameController
     def connect_with_server 
         invariant 
         pre_connect_with_server
-
+		
+		s = XMLRPC::Client.new(host, "/", port)
+		@server = s.proxy("manager")
+		#TODO: get username, check if username exists already
+		
         post_connect_with_server
         invariant
     end 
 
+	def client_listener
+		#TODO: create listener server for this client so that it can receive commands from the 
+		# server
+	end
+	
     def join_game_room
         invariant 
         pre_join_game_room
 
+		#TODO: Figure out args/IP addresses and junk
+		#@server.join_room()
+		
         post_join_game_room
         invariant
     end 
@@ -31,6 +43,7 @@ class Client < GameController
         elsif num_players == "2"
             # play distributed
             @gametype = :distributed
+			# call select_game_mode to setup rules?
             puts "pass to server's setup_game"
         end
 
@@ -51,4 +64,21 @@ class Client < GameController
         post_column_press
         invariant
     end
+	
+	def select_game_mode
+		# set up rules of game? Somehow get this from user?
+	end
+	
+	def exit
+		#end the client session
+	end
+	
+	def update_board
+		# to be called from server with the listener, to update the client view of board
+	end
+	
+	def message
+		# recieve a message from the server?? Idk if needed
+	end
+	
 end
