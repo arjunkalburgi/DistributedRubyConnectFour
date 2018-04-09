@@ -45,6 +45,10 @@ module StatsContracts
     end
 
     def post_league_stats(result)
-        raise "Database Input Error, result must be String" unless result.is_a? String
+        raise "Database Input Error, result must be an array of Strings" unless result.is_a? Array
+        result.each { |g|
+            raise "Database Input Error, not all elements of the result were of type String" unless g.is_a? String
+        }
+
     end
 end

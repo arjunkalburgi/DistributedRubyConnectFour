@@ -90,21 +90,34 @@ class Stats
 		number_of_incomplete_games = @connection.query("select count(*) from gamestats gamestats WHERE is_complete=0 and (player1 = '#{playername}' or player2 = '#{playername}')").first[0].to_i
 
 		if number_of_completed_games == 0 and number_of_wins == 0 and number_of_incomplete_games == 0
-			puts "#{playername} has not played any games."
+			result = "#{playername} has not played any games."
 		else 
-			puts "#{playername} has finished #{number_of_completed_games} games and won #{number_of_wins} of them. #{playername} has #{number_of_incomplete_games} games unfinished."
+			result = "#{playername} has finished #{number_of_completed_games} games and won #{number_of_wins} of them. #{playername} has #{number_of_incomplete_games} games unfinished."
 		end 
+		puts result
 
 		post_get_player_stats
 		invariant
+
+		result
 	end
 
 	def get_league_stats
 		invariant 
 		pre_get_league_stats
 
-		post_get_league_stats
+		r = @connection.query("select winner, count(winner) as wins from gamestats group by winner order by count(winner) desc limit 10")
+		topten = []
+		index = 1
+		r.each_hash do |row|
+			topten << "#{index}. #{row['winner']} has won #{row['wins']} games."
+			index += 1
+		end 
+
+		post_get_league_stats(topten)
 		invariant
+
+		topten
 	end
 
 end
