@@ -1,3 +1,6 @@
+require 'xmlrpc/server'
+require 'xmlrpc/client'
+require 'socket'
 require_relative './client_contracts'
 require_relative './game/game_controller'
 

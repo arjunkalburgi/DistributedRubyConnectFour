@@ -44,19 +44,19 @@ class Server
 		invariant
 	end
 
-    def enter_room(player, room_id, game: nil)
-		invariant 
-		pre_enter_room(player)
-		if @rooms.key?(room_id)
-			join_room(player, room_id)
-			else
-			# load game into game if it exists
-			# game = loadgame()
-			create_room(player, room_id, game)
-        end 
-        post_enter_room
-        invariant 
-    end
+    #def enter_room(player, room_id, game: nil)
+		#invariant 
+		#pre_enter_room(player)
+		#if @rooms.key?(room_id)
+			#join_room(player, room_id)
+			#else
+			## load game into game if it exists
+			## game = loadgame()
+			#create_room(player, room_id, game)
+        #end 
+        #post_enter_room
+        #invariant 
+    #end
 
     def create_room(username, room_id, game)
         invariant 

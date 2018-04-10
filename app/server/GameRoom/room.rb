@@ -1,5 +1,5 @@
 require_relative './room_contracts'
-require_relative '.../client/game/game/game'
+require_relative '../../client/game/game/game'
 class Room
     include RoomContracts
 	attr_reader :players, :num_players
