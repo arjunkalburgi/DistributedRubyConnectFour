@@ -5,18 +5,22 @@ class Client < GameController
     include ClientContracts   
 
     attr_reader :available_rooms
-    def connect_with_server(username, ip_address, port)
+    def connect_with_server(username, port)
         invariant 
         pre_connect_with_server
 		
 		s = XMLRPC::Client.new(host, "/", port)
 		@server = s.proxy("server")
 		@available_rooms = s.get_room_ids
-		# TODO: connect currently expects a player object, can we pass that in here?
-		while (!s.connect(username, ))
-		
+		# TODO: Figure out how this works
+		#ip_address = something
+		if (!s.connect(username, ip_address, port))
+			#username exists already
+			return false
+		end
         post_connect_with_server
         invariant
+        return true
     end 
 
 	def client_listener
@@ -41,13 +45,13 @@ class Client < GameController
 
         if num_players == "1"
             # play locally 
-            @gametype = :local
+            #@gametype = :local
             super(rows, columns, type, num_players, player_names)
         elsif num_players == "2"
             # play distributed
-            @gametype = :distributed
+            #@gametype = :distributed
 			# call select_game_mode to setup rules?
-            puts "pass to server's setup_game"
+			@server.
         end
 
         post_setup_game

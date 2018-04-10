@@ -20,14 +20,14 @@ class Server
         invariant
     end
 
-    def connect(player, ip_address, port)
+    def connect(player_name, ip_address, port)
         # create (room_number==nil) / join room (room_number!=nil)
         invariant 
-        pre_connect(player)
+        pre_connect(player_name)
 
 		c = XMLRPC::Client.new(ip_addr, "/", port)
-		if !@clients.key?(player.player_name)
-			@clients[player.player_name] = c.proxy("client")
+		if !@clients.key?(player_name)
+			@clients[player_name] = c.proxy("client")
 		else
 			return false
 		end

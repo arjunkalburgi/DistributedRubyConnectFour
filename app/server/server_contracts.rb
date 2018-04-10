@@ -28,7 +28,8 @@ module ServerContracts
  
 
 	def pre_connect(player)
-		raise "Server Error, player must be a Player" unless player.is_a? Player
+		#currently we're just taking in the username
+		#raise "Server Error, player must be a Player" unless player.is_a? Player
 	end 
 	def post_connect
 		# no contracts
