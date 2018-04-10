@@ -8,10 +8,10 @@ class Client < GameController
     def connect_with_server(username, port)
         invariant 
         pre_connect_with_server
-		
+		@player_name = username
 		s = XMLRPC::Client.new(host, "/", port)
 		@server = s.proxy("server")
-		@available_rooms = s.get_room_ids
+		#@available_rooms = s.get_room_ids
 		# TODO: Figure out how this works
 		#ip_address = something
 		if (!s.connect(username, ip_address, port))
@@ -28,53 +28,58 @@ class Client < GameController
 		# server
 	end
 	
-    def join_game_room
+    def join_game_room(player_name, room_id)
         invariant 
         pre_join_game_room
 
 		#TODO: Figure out args/IP addresses and junk
-		#@server.join_room()
+		@server.join_room(player_name, room_id)
+		@room_id = room_id
 		
         post_join_game_room
         invariant
     end 
     
-    def setup_game(rows, columns, type, num_players, player_names)
+    def setup_game(rows, columns, type, num_players, player_names, room_id)
         invariant 
         pre_setup_game
 
+		super(rows, columns, type, num_players, player_names)
+		# player who created room is index 0 in players
         if num_players == "1"
             # play locally 
+			puts "Local play VS AI"
             #@gametype = :local
-            super(rows, columns, type, num_players, player_names)
+            #super(rows, columns, type, num_players, player_names)
         elsif num_players == "2"
             # play distributed
+			puts "Distributed network play"
             #@gametype = :distributed
-			# call select_game_mode to setup rules?
-			@server.
+			@server.create_room(@player_name, room_id, @game)
         end
-
+		@room_id = room_id
         post_setup_game
         invariant
     end
 
-    def column_press(column, value, gui)
+    def distributed_column_press(column, value)
+		# call this biz instead of column_press if you're playing multiplayer online
         invariant 
         pre_column_press
-
-        @server.column_press(column, value)
-
+		# if it's not your turn, pressing a column does nothing
+		if @player_name != @game.players[@game.current_player_num].player_name
+			puts "It is not your turn."
+			return false
+		end
+		if @server.get_num_players_in_room(@room_id) < @server.get_required_players_in_room(@room_id)
+			puts "Please wait for the required number of players to join the game."
+			return false
+		end
+		
+        @server.column_press(room_id, column, value)
         post_column_press
         invariant
     end
-	
-	def select_game_mode
-		# set up rules of game? Somehow get this from user?
-	end
-	
-	def update_board
-		# to be called from server with the listener, to update the client view of board
-	end
 	
 	def message
 		# recieve a message from the server?? Idk if needed
@@ -86,6 +91,7 @@ class Client < GameController
 	
 	def exit
 		#end the client session
+		server.disconnect
 	end
 	
 end

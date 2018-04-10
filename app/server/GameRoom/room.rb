@@ -2,7 +2,7 @@ require_relative './room_contracts'
 require_relative '.../client/game/game/game'
 class Room
     include RoomContracts
-
+	attr_reader :players, :num_players
     def initialize(num_players=2)
         @players = []
         @num_players = num_players

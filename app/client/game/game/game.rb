@@ -8,8 +8,8 @@ require_relative '../player/ai'
 
 class Game 
     include GameContracts
-    attr_reader :players, :board, :current_player_num, :token_limitations
-
+    attr_reader :board, :current_player_num, :token_limitations
+	attr_accessor :players
     def initialize(rows=nil, columns=nil, players=nil, token_limitations=false, debug=false)
         pre_init(rows, columns, players)
 
