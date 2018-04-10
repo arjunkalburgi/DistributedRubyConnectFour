@@ -5,16 +5,22 @@ class Client < GameController
     include ClientContracts   
 
     attr_reader :available_rooms
-    def connect_with_server(username, port)
+    
+    def initialize(host, port)
+		super()
+		s = XMLRPC::Client.new(host, "/", port)
+		@server = s.proxy("server")
+    end
+    
+    def connect_with_server(username)
         invariant 
         pre_connect_with_server
 		@player_name = username
-		s = XMLRPC::Client.new(host, "/", port)
-		@server = s.proxy("server")
-		#@available_rooms = s.get_room_ids
-		# TODO: Figure out how this works
-		#ip_address = something
-		if (!s.connect(username, ip_address, port))
+		#s = XMLRPC::Client.new(host, "/", port)
+		#@server = s.proxy("server")
+		@available_rooms = @server.get_room_ids
+		ip_address = Socket.ip_address_list[1].ip_address
+		if (!@server.connect(username, ip_address, port))
 			#username exists already
 			return false
 		end
@@ -26,13 +32,19 @@ class Client < GameController
 	def client_listener
 		#TODO: create listener server for this client so that it can receive commands from the 
 		# server
+		#ip_address = Socket.ip_address_list[1] # public ip, see https://ruby-doc.org/stdlib-1.9.3/libdoc/socket/rdoc/Socket.html#method-c-ip_address_list
+		Thread.new {
+			s = XMLRPC::Server.new(port, Socket.ip_address_list[1].ip_address)
+			s.add_handler("client", self)
+			s.serve
+			exit
+		}
 	end
 	
     def join_game_room(player_name, room_id)
         invariant 
         pre_join_game_room
 
-		#TODO: Figure out args/IP addresses and junk
 		@server.join_room(player_name, room_id)
 		@room_id = room_id
 		
