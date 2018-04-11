@@ -119,5 +119,13 @@ class Stats
 
 		topten
 	end
+	
+	def serialize_game(game)
+		return Marshal::dump(game)
+	end
+	
+	def deserialize_game(game_string)
+		return Marshal::load(game_string)
+	end
 
 end

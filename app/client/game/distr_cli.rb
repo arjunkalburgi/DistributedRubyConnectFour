@@ -1,6 +1,7 @@
 require_relative './game/game'
 require_relative './game/game_error'
 require_relative '../../server/GameRoom/room'
+require_relative '../../stats/stats'
 require 'xmlrpc/server'
 require 'xmlrpc/client'
 require 'set'
@@ -133,13 +134,12 @@ class CLI_Game
             #else 
             #    #wait for the other player to connect
             #end 
-            @g = Game.new(6, 7, [p1, p2], token_limitations)
+            @g = Game.new(rows, columns, [p1, p2], token_limitations)
             puts room_name
             puts @username
-            @server.create_spaghetti_room(@username, room_name)
+            @server.create_spaghetti_room(@username, room_name, serialize_game(@g))
         else
-            @server.join_room(@username, room_name)
-            @g = Game.new
+            @g = deserialize_game(@server.join_room(@username, room_name))
         end
     
 		puts "Waiting for other players to join room..."

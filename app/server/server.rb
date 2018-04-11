@@ -3,6 +3,7 @@ require 'xmlrpc/client'
 require_relative './server_contracts'
 require_relative './GameRoom/room'
 require_relative '../client/game/game/game'
+require_relative '../stats/stats'
 
 class Server 
     include ServerContracts    
@@ -59,10 +60,10 @@ class Server
         #invariant 
     #end
 
-    def create_spaghetti_room(username, room_id)
+    def create_spaghetti_room(username, room_id, game_string)
         invariant 
         #pre_create_room
-        game = Game.new
+        game = deserialize_game(game_string)
         puts "Entered create"
 		player = game.players[0]
 		player.player_name = username
@@ -94,7 +95,7 @@ class Server
 			return
         else
             if room.add_player(new_player)
-				return true
+				return serialize_game(room.game)
             else
 				puts "add player failed"
 				return false
