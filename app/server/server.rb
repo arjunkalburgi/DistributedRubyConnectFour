@@ -12,7 +12,7 @@ class Server
 
         @rooms = Hash.new
 		@clients = Hash.new
-		s = XMLRPC::Server.new(port, hostname, number_of_rooms*2)
+		s = XMLRPC::Server.new(port, host, number_of_rooms*2)
 		s.add_handler("handler", self)
 		s.serve
         

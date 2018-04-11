@@ -11,13 +11,10 @@ module ServerContracts
         }
 	end 
 
-	def pre_initialize(host, user, pwd, db, port, number_of_rooms)
+	def pre_initialize(host, port, number_of_rooms)
 		# database
 		raise "Database Creation Error, host must be String" unless host.is_a?(String)
-        raise "Database Creation Error, user must be String" unless user.is_a?(String)
-        raise "Database Creation Error, pwd must be String" unless pwd.is_a?(String)
-        raise "Database Creation Error, db must be String" unless db.is_a?(String)
-        raise "Database Creation Error, port must be String" unless port.is_a?(Fixnum)
+        raise "Database Creation Error, port must be Fixnum" unless port.is_a?(Fixnum)
         raise "Number of rooms must be greater than 0" unless number_of_rooms > 0
 
 		# maybe something about socket initalizing? 
