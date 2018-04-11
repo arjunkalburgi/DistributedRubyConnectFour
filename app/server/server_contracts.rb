@@ -5,10 +5,10 @@ require_relative './GameRoom/room'
 module ServerContracts
 
 	def invariant
-		raise "RoomError, Rooms must be an array" unless @rooms.kind_of? Array 
-        @rooms.each { |room|
-            raise "RoomError, Each item in the list of rooms must be of the Room class" unless room.is_a? Room 
-        }
+		raise "RoomError, Rooms must be a hash" unless @rooms.kind_of? Hash 
+        #@rooms.each { |room|
+        #    raise "RoomError, Each item in the list of rooms must be of the Room class" unless room.is_a? Room 
+        #}
 	end 
 
 	def pre_initialize(host, port, number_of_rooms)

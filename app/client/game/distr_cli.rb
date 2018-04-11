@@ -8,15 +8,15 @@ require 'set'
 class CLI_Game
     def column_press(column, token)
         begin
-                g.play_move(column, token)
+                @g.play_move(column, token)
             rescue *GameError.GameEnd => gameend
                 if gameend.is_a? GameWon
                     puts "Congratulations, we have a winner"
                     puts gameend.player.player_name + " won with the combination: " + gameend.player.player_win_condition.to_s
-                    puts g.board.print_board
+                    puts @g.board.print_board
                 elsif gameend.is_a? NoMoreMoves
                     puts "There are no more possible moves."
-                    puts g.board.print_board
+                    puts @g.board.print_board
                     puts "It's a cats game!."
                 end
             rescue *GameError.TryAgain => slip
@@ -24,7 +24,7 @@ class CLI_Game
                     puts "Column number: " + slip.column.to_s + " is not valid." 
                 end 
                 puts slip.message
-                g.reset_current_player(current_player)
+                @g.reset_current_player(current_player)
                 puts current_player.player_name + " please play again."
             rescue *GameError.Wrong => error 
                 puts "Something went wrong sorry"
@@ -36,18 +36,18 @@ class CLI_Game
     def game_loop
         @port_num = 50500
         Thread.new {
-		s = XMLRPC::Server.new(@port_num, Socket.ip_address_list[1].ip_address)
+		s = XMLRPC::Server.new(@port_num + 1, Socket.ip_address_list[1].ip_address)
 		s.add_handler("client", self)
 		s.serve
 		exit
 	}
         @user_input = nil
-    
-        print "Distributed Connect 4 CLI. For now, you must play online."
+		sleep(1)
+        puts "Distributed Connect 4 CLI. For now, you must play online."
     
         s = XMLRPC::Client.new('localhost', "/", @port_num)
-        @server = s.proxy("server")
-    
+        @server = s.proxy("handler")
+		@server.get_room_ids
         @username = ""
         while @username == ""
             print "Enter a username: "
@@ -70,11 +70,16 @@ class CLI_Game
         room_name = ""
     
         while room_name == ""
-            print "Enter a room name"
+			puts "Current Rooms:"
+			puts @available_rooms.to_s
+            print "Enter a room name: "
             room_name = gets.chomp
-            if @available_rooms.key?(room_name)
+            if @available_rooms.include?(room_name) && create_join == 'c'
                 room_name = ""
-                print "Room name is taken, please try another one."
+                puts "Room name is taken, please try another one."
+            elsif !@available_rooms.include?(room_name) && create_join == 'j'
+				room_name = ""
+				puts "Room does not exist, please try another one."
             end
         end
         if create_join == "c"
@@ -102,13 +107,13 @@ class CLI_Game
            
             if token_limitations
                 puts name + " is playing for OTTO"
-                p1 = Player.new(username, ["O","T","T","O"], ["O", "O", "O", "O", "O", "O", "T", "T", "T", "T", "T", "T"]) 
+                p1 = Player.new(@username, ["O","T","T","O"], ["O", "O", "O", "O", "O", "O", "T", "T", "T", "T", "T", "T"]) 
             else
                 print "P1 - Length of win condition? "
                 num_token = gets.chomp.to_i
                 print "P1 - What is your token? "
                 token = gets.chomp
-                p1 = Player.new(username, Array.new(num_token, token)) 
+                p1 = Player.new(@username, Array.new(num_token, token)) 
             end
             if token == 'R'
                 token2 = 'Y'
@@ -128,21 +133,23 @@ class CLI_Game
             #else 
             #    #wait for the other player to connect
             #end 
-            g = Game.new(rows, columns, [p1, p2], token_limitations)
-            @server.create_room(username, room_name, g)
+            @g = Game.new(rows, columns, [p1, p2], token_limitations)
+            puts room_name
+            puts @username
+            @server.create_spaghetti_room(@username, room_name)
         else
-            @server.join_room(username, room_name)
+            @server.join_room(@username, room_name)
         end
     
-    
-        while @server.get_num_players_in_room < @server.get_required_players_in_room
+		puts "Waiting for other players to join room..."
+        while !@server.can_start_game?(room_name)
             # don't spam the server
             sleep(1)
         end
 
 
         while true
-            puts g.board.print_board
+            puts @g.board.print_board
 
             current_player = g.get_current_player
             if current_player.player_name != @username

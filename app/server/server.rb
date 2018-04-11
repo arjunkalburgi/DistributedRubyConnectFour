@@ -2,6 +2,7 @@ require 'xmlrpc/server'
 require 'xmlrpc/client'
 require_relative './server_contracts'
 require_relative './GameRoom/room'
+require_relative '../client/game/game/game'
 
 class Server 
     include ServerContracts    
@@ -25,14 +26,14 @@ class Server
         invariant 
         pre_connect(player_name)
 
-		c = XMLRPC::Client.new(ip_addr, "/", port)
+		c = XMLRPC::Client.new(ip_address, "/", port + 1)
 		if !@clients.key?(player_name)
 			@clients[player_name] = c.proxy("client")
 		else
 			return false
 		end
-			post_connect
-			invariant 
+		post_connect
+		invariant 
 		return true
     end 
 	
@@ -58,9 +59,11 @@ class Server
         #invariant 
     #end
 
-    def create_room(username, room_id, game)
+    def create_spaghetti_room(username, room_id)
         invariant 
-        pre_create_room
+        #pre_create_room
+        game = Game.new
+        puts "Entered create"
 		player = game.players[0]
 		player.player_name = username
 		if @rooms.key?(room_id)
@@ -70,14 +73,15 @@ class Server
         room = Room.new(game)
 		room.add_player(player)
 		@rooms[room_id] = room
-
-        post_create_room(room_id)
+		puts "Ended create"
+        #post_create_room(room_id)
         invariant 
+        return true
     end 
 
     def join_room(username, room_id)
         invariant
-        pre_join_room 
+        #pre_join_room 
 		if @clients.key?(username)
 			puts "Username already exists"
 			return false
@@ -88,15 +92,15 @@ class Server
 		new_player.player_name = username
         if room.nil? 
             puts "Room no longer exists - please choose another"
-	    return
+			return
         elsif room.is_full? 
             puts "Room is full - please choose another"
-	    return
+			return
         else
             room.add_player(new_player)
         end 
 
-        post_join_room 
+        #post_join_room 
         invariant
     end
 
@@ -111,6 +115,12 @@ class Server
 	def get_required_players_in_room(room_id)
 		# as in the number of players you need to start the game
 		return @rooms[room_id].num_players
+	end
+	
+	def can_start_game?(room_id)
+		puts get_num_players_in_room(room_id)
+		puts get_required_players_in_room(room_id)
+		return get_num_players_in_room(room_id) == get_required_players_in_room(room_id)
 	end
 
     def column_press(room_id, column, token=nil)
