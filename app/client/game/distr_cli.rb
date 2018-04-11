@@ -133,12 +133,13 @@ class CLI_Game
             #else 
             #    #wait for the other player to connect
             #end 
-            @g = Game.new(rows, columns, [p1, p2], token_limitations)
+            @g = Game.new(6, 7, [p1, p2], token_limitations)
             puts room_name
             puts @username
             @server.create_spaghetti_room(@username, room_name)
         else
-            @g = @server.join_room(@username, room_name)
+            @server.join_room(@username, room_name)
+            @g = Game.new
         end
     
 		puts "Waiting for other players to join room..."
