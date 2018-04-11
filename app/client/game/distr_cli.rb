@@ -138,7 +138,7 @@ class CLI_Game
             puts @username
             @server.create_spaghetti_room(@username, room_name)
         else
-            @server.join_room(@username, room_name)
+            @g = @server.join_room(@username, room_name)
         end
     
 		puts "Waiting for other players to join room..."
@@ -151,7 +151,7 @@ class CLI_Game
         while true
             puts @g.board.print_board
 
-            current_player = g.get_current_player
+            current_player = @g.get_current_player
             if current_player.player_name != @username
                 print "Please wait for the other player to take their turn."
                 while current_player.player_name != @username

@@ -82,10 +82,6 @@ class Server
     def join_room(username, room_id)
         invariant
         #pre_join_room 
-		if @clients.key?(username)
-			puts "Username already exists"
-			return false
-		end
         room = @rooms[room_id]
 		new_player_idx = room.players.size
 		new_player = room.game.players[new_player_idx]
@@ -97,7 +93,12 @@ class Server
             puts "Room is full - please choose another"
 			return
         else
-            room.add_player(new_player)
+            if room.add_player(new_player)
+				return true
+            else
+				puts "add player failed"
+				return false
+            end
         end 
 
         #post_join_room 
@@ -120,6 +121,7 @@ class Server
 	def can_start_game?(room_id)
 		puts get_num_players_in_room(room_id)
 		puts get_required_players_in_room(room_id)
+		puts @rooms[room_id]
 		return get_num_players_in_room(room_id) == get_required_players_in_room(room_id)
 	end
 
