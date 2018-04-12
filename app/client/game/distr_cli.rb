@@ -35,6 +35,7 @@ class CLI_Game
     end
 
     def game_loop
+		@stats = Stats.new
         @port_num = 50500
         Thread.new {
 		s = XMLRPC::Server.new(@port_num + 1, Socket.ip_address_list[1].ip_address)
@@ -137,9 +138,14 @@ class CLI_Game
             @g = Game.new(rows, columns, [p1, p2], token_limitations)
             puts room_name
             puts @username
-            @server.create_spaghetti_room(@username, room_name, serialize_game(@g))
+            ser = @stats.serialize_game(@g)
+            puts @g
+            deser = @stats.deserialize_game(ser)
+            puts ser.class
+            puts deser.players
+            @server.create_spaghetti_room(@username, room_name, ser)
         else
-            @g = deserialize_game(@server.join_room(@username, room_name))
+            @g = @stats.deserialize_game(@server.join_room(@username, room_name))
         end
     
 		puts "Waiting for other players to join room..."

@@ -11,7 +11,7 @@ class Server
     
     def initialize(host, port, number_of_rooms=5)
         pre_initialize(host, port, number_of_rooms)
-
+		@stats = Stats.new
         @rooms = Hash.new
 		@clients = Hash.new
 		s = XMLRPC::Server.new(port, host, number_of_rooms*2)
@@ -63,18 +63,23 @@ class Server
     def create_spaghetti_room(username, room_id, game_string)
         invariant 
         #pre_create_room
-        game = deserialize_game(game_string)
+        game = @stats.deserialize_game(game_string)
+        puts game
         puts "Entered create"
-		player = game.players[0]
-		player.player_name = username
+        puts game.players
+		#player = game.players[0]
+		#player.player_name = username
 		if @rooms.key?(room_id)
 			puts "Room already exists"
 			return false
 		end
+		#puts "E2"
         room = Room.new(game)
+        #puts "E3"
 		room.add_player(player)
+		#puts "E4"
 		@rooms[room_id] = room
-		puts "Ended create"
+		#puts "Ended create"
         #post_create_room(room_id)
         invariant 
         return true
@@ -95,7 +100,7 @@ class Server
 			return
         else
             if room.add_player(new_player)
-				return serialize_game(room.game)
+				return @stats.serialize_game(room.game)
             else
 				puts "add player failed"
 				return false
