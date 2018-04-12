@@ -44,7 +44,7 @@ class Stats
 		invariant
 	end
 
-	def get_game(player1: nil, player2: nil, game: nil, winner: nil, is_complete: nil)
+	def get_game(player1 = nil, player2 = nil, game = nil, winner = nil, is_complete = nil)
 		invariant 
 		pre_get_game(player1, player2, game, winnerl, is_complete)
 
