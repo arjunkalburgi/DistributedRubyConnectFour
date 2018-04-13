@@ -120,12 +120,12 @@ class Stats
 		topten
 	end
 	
-	def serialize_game(game)
-		return Marshal::dump(game)
+	def serialize_item(item)
+		return Marshal::dump(item)
 	end
 	
-	def deserialize_game(game_string)
-		return Marshal::load(game_string)
+	def deserialize_item(item_string)
+		return Marshal::load(item_string)
 	end
 
 end

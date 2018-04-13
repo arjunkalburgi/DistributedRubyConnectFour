@@ -60,15 +60,14 @@ class Server
         #invariant 
     #end
 
-    def create_spaghetti_room(username, room_id, game_string)
+    def create_spaghetti_room(username, room_id, rows, columns, p1Ser, p2Ser, token_limitations)
         invariant 
         #pre_create_room
-        game = @stats.deserialize_game(game_string)
-        puts game
-        puts "Entered create"
-        puts game.players
-		#player = game.players[0]
-		#player.player_name = username
+        p1 = @stats.deserialize_item(p1Ser)
+        p2 = @stats.deserialize_item(p2Ser)
+        game = Game.new(rows, columns, [p1, p2], token_limitations)
+        player = game.players[0]
+		player.player_name = username
 		if @rooms.key?(room_id)
 			puts "Room already exists"
 			return false
@@ -100,7 +99,12 @@ class Server
 			return
         else
             if room.add_player(new_player)
-				return @stats.serialize_game(room.game)
+				rows = room.game.rows
+				columns = room.game.columns
+				p1 = room.game.players[0]
+				p2 = room.game.players[1]
+				token_lim = room.game.token_limitations
+				return [serialized list of that stuff above]
             else
 				puts "add player failed"
 				return false

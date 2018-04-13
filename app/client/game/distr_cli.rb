@@ -136,14 +136,12 @@ class CLI_Game
             #    #wait for the other player to connect
             #end 
             @g = Game.new(rows, columns, [p1, p2], token_limitations)
-            puts room_name
-            puts @username
-            ser = @stats.serialize_game(@g)
-            puts @g
-            deser = @stats.deserialize_game(ser)
+            p1Ser = @stats.serialize_item(p1)
+            p2Ser = @stats.serialize_item(p2)
+            
             puts ser.class
             puts deser.players
-            @server.create_spaghetti_room(@username, room_name, ser)
+            @server.create_spaghetti_room(@username, room_name, rows, columns, p1Ser, p2Ser, token_limitations)
         else
             @g = @stats.deserialize_game(@server.join_room(@username, room_name))
         end
