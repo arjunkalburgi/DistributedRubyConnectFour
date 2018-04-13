@@ -3,6 +3,7 @@ require 'xmlrpc/client'
 require_relative './server_contracts'
 require_relative './GameRoom/room'
 require_relative '../client/game/game/game'
+require_relative '../client/game/player/player'
 require_relative '../stats/stats'
 
 class Server 
@@ -13,6 +14,7 @@ class Server
         pre_initialize(host, port, number_of_rooms)
 		@stats = Stats.new
         @rooms = Hash.new
+        @roomComponents = Hash.new
 		@clients = Hash.new
 		s = XMLRPC::Server.new(port, host, number_of_rooms*2)
 		s.add_handler("handler", self)
@@ -60,12 +62,54 @@ class Server
         #invariant 
     #end
 
-    def create_spaghetti_room(username, room_id, rows, columns, p1Ser, p2Ser, token_limitations)
+	def set_room_name(room_id)
+		@roomComponents[room_id] = Hash.new
+	end
+
+	def set_room_player1(room_id, serPlayer1)
+		puts @stats.deserialize_item(serPlayer1).class
+		@roomComponents[room_id]["P1"] = @stats.deserialize_item(serPlayer1)
+	end
+	
+	def set_room_player2(room_id, serPlayer2)
+		@roomComponents[room_id]["P2"] = @stats.deserialize_item(serPlayer2)
+	end
+	
+	def set_room_board(room_id, serBoard)
+		@roomComponents[room_id]["board"] = @stats.deserialize_item(serBoard)
+	end
+	
+	def get_room_player1(room_id)
+		return @stats.serialize_item(@rooms.game.players[0])
+	end
+	
+	def get_room_player2(room_id)
+		return @stats.serialize_item(@rooms.game.players[1])
+	end
+	
+	def get_room_board(room_id)
+		return @stats.serialize_item(@rooms.game.board)
+	end
+	
+	def get_room_curr_player_num(room_id)
+		return @rooms.game.current_player_num
+	end
+	
+	def get_room_token_limitations(room_id)
+		return @rooms.game.token_limitations
+	end
+
+    def create_room(username, room_id, curr_player_num, token_limitations)
         invariant 
         #pre_create_room
-        p1 = @stats.deserialize_item(p1Ser)
-        p2 = @stats.deserialize_item(p2Ser)
+        #board = @stats.deserialize_item(@roomComponents[room_id]["board"])
+        p1 = @stats.deserialize_item(@roomComponents[room_id]["P1"])
+        p2 = @stats.deserialize_item(@roomComponents[room_id]["P2"])
+        rows = 6
+        columns = 7
         game = Game.new(rows, columns, [p1, p2], token_limitations)
+        #game.board = board
+        game.current_player_num = curr_player_num
         player = game.players[0]
 		player.player_name = username
 		if @rooms.key?(room_id)
@@ -99,12 +143,7 @@ class Server
 			return
         else
             if room.add_player(new_player)
-				rows = room.game.rows
-				columns = room.game.columns
-				p1 = room.game.players[0]
-				p2 = room.game.players[1]
-				token_lim = room.game.token_limitations
-				return [serialized list of that stuff above]
+				return true
             else
 				puts "add player failed"
 				return false

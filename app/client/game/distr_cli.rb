@@ -138,12 +138,27 @@ class CLI_Game
             @g = Game.new(rows, columns, [p1, p2], token_limitations)
             p1Ser = @stats.serialize_item(p1)
             p2Ser = @stats.serialize_item(p2)
-            
-            puts ser.class
-            puts deser.players
-            @server.create_spaghetti_room(@username, room_name, rows, columns, p1Ser, p2Ser, token_limitations)
+            #board = @stats.serialize_item(@g.board)
+            curr_player_num = @g.current_player_num
+            @server.set_room_name(room_name)
+            #@server.set_room_board(room_name, board)
+            @server.set_room_player1(room_name, p1Ser)
+            @server.set_room_player2(room_name, p2Ser)
+            @server.create_room(@username, room_name, curr_player_num, token_limitations)
         else
-            @g = @stats.deserialize_game(@server.join_room(@username, room_name))
+            if @server.join_room(@username, room_name)
+				#board = @stats.deserialize_item(@server.get_room_board(room_name))
+				p1 = @stats.deserialize_item(@server.get_room_player1(room_name))
+				p2 = @stats.deserialize_item(@server.get_room_player2(room_name))
+				token_lim = @stats.deserialize_item(@server.get_room_token_limitations(room_name))
+				curr_player = @stats.deserialize_item(@server.get_room_curr_player_num(room_name))
+				@g = Game.new(6, 7, [p1, p2], token_limitations)
+				#@g.board = board
+				@g.current_player_num = curr_player_num
+			else
+				puts "Couldn't join room, sorry"
+				return
+            end
         end
     
 		puts "Waiting for other players to join room..."
