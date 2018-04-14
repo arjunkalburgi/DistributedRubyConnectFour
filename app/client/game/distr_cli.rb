@@ -208,6 +208,6 @@ class CLI_Game
         puts "Wanna play again?"
     end
 end
-#puts ARGV[0].to_i
+puts ARGV[0].to_i
 game = CLI_Game.new
-game.game_loop(ARGV[0].to_i)
+game.game_loop
