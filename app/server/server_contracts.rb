@@ -33,9 +33,8 @@ module ServerContracts
 	end
 
 
-	def pre_create_room(client, game)
-		raise "ServerError, there are no empty rooms" unless @rooms.rindex(nil) == nil 
-		raise "Input Error, game must be of type Game" unless game.is_a? Game
+	def pre_create_room
+		#none
 	end 
 	def post_create_room(room_id)
 		raise "ServerError, Room not created" unless @rooms[room_id].is_a? Room
@@ -43,7 +42,6 @@ module ServerContracts
 
 
 	def pre_join_room(client, rn)
-		raise "InputError, room_number must exist within the range of rooms" unless rn.between?(0, @rooms.size-1)
 		raise "ServerError, room at room_number must be a valid room" unless @rooms[rn].is_a? Room
 	end 
 	def post_join_room

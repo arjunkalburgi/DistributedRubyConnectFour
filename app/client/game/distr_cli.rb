@@ -34,15 +34,15 @@ class CLI_Game
             end
     end
 
-    def game_loop
+    def game_loop(port_num=50500)
 		@stats = Stats.new
-        @port_num = 50500
+        @port_num = port_num
         Thread.new {
-		s = XMLRPC::Server.new(@port_num + 1, Socket.ip_address_list[1].ip_address)
-		s.add_handler("client", self)
-		s.serve
-		exit
-	}
+			s = XMLRPC::Server.new(@port_num + 1, 'localhost', 2)
+			s.add_handler("client", self)
+			s.serve
+			exit
+		}
         @user_input = nil
 		sleep(1)
         puts "Distributed Connect 4 CLI. For now, you must play online."
@@ -85,21 +85,24 @@ class CLI_Game
             end
         end
         if create_join == "c"
-            print "Number of Columns: "
-            columns = gets.chomp.to_i
-            print "Number of Rows: "
-            rows = gets.chomp.to_i
+            #print "Number of Columns: "
+            #columns = gets.chomp.to_i
+            columns = 7
+            #print "Number of Rows: "
+            #rows = gets.chomp.to_i
+            rows = 6
             #while not Set["1","2"].include? user_input
             #    print "How many players? 1 or 2: "
             #    user_input = gets.chomp
             #end 
             #num_players = user_input.to_i
             num_players = 2   
-            user_input = nil
-            while not Set["1","2"].include? user_input
-                print "Would you like to play OTTO/TOOT(1) or ConnectFour(2) style? 1 or 2: "
-                user_input = gets.chomp
-            end 
+            #user_input = nil
+            #while not Set["1","2"].include? user_input
+            #    print "Would you like to play OTTO/TOOT(1) or ConnectFour(2) style? 1 or 2: "
+            #    user_input = gets.chomp
+            #end 
+            user_input = 2
             style = user_input
             if style == "1"
                 token_limitations = true
@@ -111,10 +114,12 @@ class CLI_Game
                 puts name + " is playing for OTTO"
                 p1 = Player.new(@username, ["O","T","T","O"], ["O", "O", "O", "O", "O", "O", "T", "T", "T", "T", "T", "T"]) 
             else
-                print "P1 - Length of win condition? "
-                num_token = gets.chomp.to_i
-                print "P1 - What is your token? "
-                token = gets.chomp
+                #print "P1 - Length of win condition? "
+                #num_token = gets.chomp.to_i
+                num_token = 4
+                #print "P1 - What is your token? "
+                #token = gets.chomp
+                token = 'R'
                 p1 = Player.new(@username, Array.new(num_token, token)) 
             end
             if token == 'R'
@@ -136,25 +141,25 @@ class CLI_Game
             #    #wait for the other player to connect
             #end 
             @g = Game.new(rows, columns, [p1, p2], token_limitations)
-            p1Ser = @stats.serialize_item(p1)
-            p2Ser = @stats.serialize_item(p2)
+            #p1Ser = @stats.serialize_item(p1)
+            #p2Ser = @stats.serialize_item(p2)
             #board = @stats.serialize_item(@g.board)
-            curr_player_num = @g.current_player_num
-            @server.set_room_name(room_name)
+            #curr_player_num = @g.current_player_num
+            #@server.set_room_name(room_name)
             #@server.set_room_board(room_name, board)
-            @server.set_room_player1(room_name, p1Ser)
-            @server.set_room_player2(room_name, p2Ser)
-            @server.create_room(@username, room_name, curr_player_num, token_limitations)
+            #@server.set_room_player1(room_name, p1Ser)
+            #@server.set_room_player2(room_name, p2Ser)
+            @server.create_room(@username, room_name, token_limitations)
         else
             if @server.join_room(@username, room_name)
 				#board = @stats.deserialize_item(@server.get_room_board(room_name))
-				p1 = @stats.deserialize_item(@server.get_room_player1(room_name))
-				p2 = @stats.deserialize_item(@server.get_room_player2(room_name))
-				token_lim = @stats.deserialize_item(@server.get_room_token_limitations(room_name))
-				curr_player = @stats.deserialize_item(@server.get_room_curr_player_num(room_name))
-				@g = Game.new(6, 7, [p1, p2], token_limitations)
+				p1 = Player.new("P1", Array.new(4, 'R'))
+				p2 = Player.new("P2", Array.new(4, 'Y'))
+				@username = "P2"
+				
+				@g = Game.new(6, 7, [p1, p2], false)
 				#@g.board = board
-				@g.current_player_num = curr_player_num
+				#@g.current_player_num = curr_player_num
 			else
 				puts "Couldn't join room, sorry"
 				return
@@ -172,7 +177,9 @@ class CLI_Game
             puts @g.board.print_board
 
             current_player = @g.get_current_player
-            if current_player.player_name != @username
+            #puts @g.players[0].player_name
+            #puts @g.players[0].player_name
+            if @g.get_current_player.player_name != @username
                 print "Please wait for the other player to take their turn."
                 while current_player.player_name != @username
                     # do nothing
@@ -191,17 +198,16 @@ class CLI_Game
                     token = gets.chomp
                 end 
             end
-            print current_player.player_name + ", what column number would you like to input your token into: " 
+            print @g.get_current_player.player_name + ", what column number would you like to input your token into: " 
             column = gets.chomp.to_i - 1
             #end 
-
-            column_press(column, token)
-    
+            @server.column_press(room_name, column, @g.get_current_player.player_win_condition[0])
+			
         end 
 
         puts "Wanna play again?"
     end
 end
-
+#puts ARGV[0].to_i
 game = CLI_Game.new
-game.game_loop
+game.game_loop(ARGV[0].to_i)

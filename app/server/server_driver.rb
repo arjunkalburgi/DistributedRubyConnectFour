@@ -1,3 +1,3 @@
 require_relative './server'
 
-Server.new('localhost', 50500)
+Server.new('localhost', ARGV[0].to_i)

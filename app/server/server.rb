@@ -28,8 +28,8 @@ class Server
         # create (room_number==nil) / join room (room_number!=nil)
         invariant 
         pre_connect(player_name)
-
-		c = XMLRPC::Client.new(ip_address, "/", port + 1)
+		#c = XMLRPC::Client.new(ip_address, "/", port + 1)
+		c = XMLRPC::Client.new('localhost', "/", port + 1)
 		if !@clients.key?(player_name)
 			@clients[player_name] = c.proxy("client")
 		else
@@ -48,89 +48,71 @@ class Server
 		invariant
 	end
 
-    #def enter_room(player, room_id, game: nil)
-		#invariant 
-		#pre_enter_room(player)
-		#if @rooms.key?(room_id)
-			#join_room(player, room_id)
-			#else
-			## load game into game if it exists
-			## game = loadgame()
-			#create_room(player, room_id, game)
-        #end 
-        #post_enter_room
-        #invariant 
-    #end
+	#def set_room_name(room_id)
+		#@roomComponents[room_id] = Hash.new
+	#end
 
-	def set_room_name(room_id)
-		@roomComponents[room_id] = Hash.new
-	end
+	#def set_room_player1(room_id, serPlayer1)
+		#puts @stats.deserialize_item(serPlayer1).class
+		#@roomComponents[room_id]["P1"] = @stats.deserialize_item(serPlayer1)
+	#end
+	
+	#def set_room_player2(room_id, serPlayer2)
+		#@roomComponents[room_id]["P2"] = @stats.deserialize_item(serPlayer2)
+	#end
+	
+	#def set_room_board(room_id, serBoard)
+		#@roomComponents[room_id]["board"] = @stats.deserialize_item(serBoard)
+	#end
+	
+	#def get_room_player1(room_id)
+		#return @stats.serialize_item(@rooms.game.players[0])
+	#end
+	
+	#def get_room_player2(room_id)
+		#return @stats.serialize_item(@rooms.game.players[1])
+	#end
+	
+	#def get_room_board(room_id)
+		#return @stats.serialize_item(@rooms.game.board)
+	#end
+	
+	#def get_room_curr_player_num(room_id)
+		#return @rooms.game.current_player_num
+	#end
+	
+	#def get_room_token_limitations(room_id)
+		#return @rooms.game.token_limitations
+	#end
 
-	def set_room_player1(room_id, serPlayer1)
-		puts @stats.deserialize_item(serPlayer1).class
-		@roomComponents[room_id]["P1"] = @stats.deserialize_item(serPlayer1)
-	end
-	
-	def set_room_player2(room_id, serPlayer2)
-		@roomComponents[room_id]["P2"] = @stats.deserialize_item(serPlayer2)
-	end
-	
-	def set_room_board(room_id, serBoard)
-		@roomComponents[room_id]["board"] = @stats.deserialize_item(serBoard)
-	end
-	
-	def get_room_player1(room_id)
-		return @stats.serialize_item(@rooms.game.players[0])
-	end
-	
-	def get_room_player2(room_id)
-		return @stats.serialize_item(@rooms.game.players[1])
-	end
-	
-	def get_room_board(room_id)
-		return @stats.serialize_item(@rooms.game.board)
-	end
-	
-	def get_room_curr_player_num(room_id)
-		return @rooms.game.current_player_num
-	end
-	
-	def get_room_token_limitations(room_id)
-		return @rooms.game.token_limitations
-	end
-
-    def create_room(username, room_id, curr_player_num, token_limitations)
+    def create_room(username, room_id, token_limitations)
         invariant 
-        #pre_create_room
+        pre_create_room
         #board = @stats.deserialize_item(@roomComponents[room_id]["board"])
-        p1 = @stats.deserialize_item(@roomComponents[room_id]["P1"])
-        p2 = @stats.deserialize_item(@roomComponents[room_id]["P2"])
+        p1 = Player.new(@username, Array.new(4, 'R'))
+        p2 = Player.new(@username, Array.new(4, 'Y'))
+        player = p1
         rows = 6
         columns = 7
         game = Game.new(rows, columns, [p1, p2], token_limitations)
         #game.board = board
-        game.current_player_num = curr_player_num
-        player = game.players[0]
-		player.player_name = username
+        #player = Player.new(@username, Array.new(4, token))
+		#player.player_name = username
 		if @rooms.key?(room_id)
 			puts "Room already exists"
 			return false
 		end
-		#puts "E2"
-        room = Room.new(game)
-        #puts "E3"
-		room.add_player(player)
-		#puts "E4"
+		room = Room.new(game)
+        room.add_player(player)
 		@rooms[room_id] = room
-		#puts "Ended create"
-        #post_create_room(room_id)
+		post_create_room(room_id)
         invariant 
         return true
     end 
 
     def join_room(username, room_id)
         invariant
-        #pre_join_room 
+        pre_join_room(room_id)
         room = @rooms[room_id]
 		new_player_idx = room.players.size
 		new_player = room.game.players[new_player_idx]
@@ -150,7 +132,7 @@ class Server
             end
         end 
 
-        #post_join_room 
+        post_join_room 
         invariant
     end
 
@@ -174,13 +156,14 @@ class Server
 		return get_num_players_in_room(room_id) == get_required_players_in_room(room_id)
 	end
 
-    def column_press(room_id, column, token=nil)
-        invariant 
-        pre_take_turn(room_id, game_obj)
-
+    def column_press(room_id, column, token)
+        #invariant 
+        #pre_take_turn(room_id, game_obj)
+        puts "made it"
         room = @rooms[room_id]
-		game_obj = room.game
-		begin
+        game_obj = room.game
+
+        begin
 			game_obj.play_move(column, token)
 		rescue
 			# don't do anything, let the clients handle it, we just want to save this new version of game_obj
@@ -190,6 +173,10 @@ class Server
 		
 		#update the boards and GUI with this move
         room.players.each { |player|
+			puts room.players
+			puts @clients.keys
+			player.player_name
+			puts @clients[player.player_name]
 			@clients[player.player_name].column_press(column, token)
         }
         begin
@@ -198,8 +185,8 @@ class Server
             game_over(room_id)
         end
 
-        post_take_turn
-        invariant
+        #post_take_turn
+        #invariant
     end
 	
 	def game_over(room_id)
