@@ -1,5 +1,5 @@
-require_relative '.../client/game/player/player'
-require_relative '.../client/game/game/game'
+require_relative '../../client/game/player/player'
+require_relative '../../client/game/game/game'
 module RoomContracts
 
     def invariant

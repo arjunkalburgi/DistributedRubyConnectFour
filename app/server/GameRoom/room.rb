@@ -1,11 +1,13 @@
 require_relative './room_contracts'
-require_relative '.../client/game/game/game'
+require_relative '../../client/game/game/game'
 class Room
     include RoomContracts
-
-    def initialize(num_players=2)
+	attr_reader :players, :num_players
+	attr_accessor :game
+    def initialize(game, num_players=2)
         @players = []
         @num_players = num_players
+	@game = game
     end
     
     def get_game_info()
@@ -26,16 +28,12 @@ class Room
 		old_len = @players.length
 		if @players.length == @num_players
 			# trying to join a full room, tell them no and then kick em out
-			return
+			return false
 		end
 		@players << player
-		if @players.length == @num_players
-			# room is now full, query players as to the game type they want
-			@game = get_game_info()
-			setup_game(game)
-		end
 		post_add_player(old_len, @players.length)
 		invariant
+		return true
     end
 
     def end_game_free_room

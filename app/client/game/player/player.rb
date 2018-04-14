@@ -3,8 +3,8 @@ require_relative './player_contracts'
 
 class Player
     include PlayerContracts
-    attr_reader :player_name, :player_win_condition, :tokens
-    attr_accessor :available_tokens
+    attr_reader  :player_win_condition, :tokens
+    attr_accessor :available_tokens, :player_name
 
     def initialize(name, win_condition, available_tokens=nil)
         # invariant 

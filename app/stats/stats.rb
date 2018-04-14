@@ -1,32 +1,32 @@
 require_relative './stats_contracts'
-require 'mysql'
+require 'mysql2'
 
 class Stats 
 	include StatsContracts    
 
 	def initialize(host="localhost", username="root", password="password")
-		invariant 
-		pre_initialize(host, username, password)
+		#invariant 
+		#pre_initialize(host, username, password)
 
-		begin
-			database = "DistributedRubyConnectFour"
-			@connection = Mysql.new(host, username, password, database)
-		rescue Mysql::Error => e
-			puts e.error
-		end
+		#begin
+			#database = "DistributedRubyConnectFour"
+			#@connection = Mysql.new(host, username, password, database)
+		#rescue Mysql::Error => e
+			#puts e.error
+		#end
 
-		if @connection.query("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='DistributedRubyConnectFour'").any? 
-			@connection.query("CREATE DATABASE IF NOT EXISTS DistributedRubyConnectFour;")
-		else 
-			@connection.query("use DistributedRubyConnectFour")
-		end 
+		#if @connection.query("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='DistributedRubyConnectFour'").any? 
+			#@connection.query("CREATE DATABASE IF NOT EXISTS DistributedRubyConnectFour;")
+		#else 
+			#@connection.query("use DistributedRubyConnectFour")
+		#end 
 
-		if !@connection.query("show tables").any? 
-			@connection.query("CREATE TABLE gamestats (player1 VARCHAR(20), player2 VARCHAR(20),game LONGTEXT, is_complete TINYINT(1), winner VARCHAR(20));")
-		end 
+		#if !@connection.query("show tables").any? 
+			#@connection.query("CREATE TABLE gamestats (player1 VARCHAR(20), player2 VARCHAR(20),game LONGTEXT, is_complete TINYINT(1), winner VARCHAR(20));")
+		#end 
 
-		post_initialize
-		invariant
+		#post_initialize
+		#invariant
 	end
 
 	def add_game_to_database(game)
@@ -44,7 +44,7 @@ class Stats
 		invariant
 	end
 
-	def get_game(player1: nil, player2: nil, game: nil, winner: nil, is_complete: nil)
+	def get_game(player1 = nil, player2 = nil, game = nil, winner = nil, is_complete = nil)
 		invariant 
 		pre_get_game(player1, player2, game, winnerl, is_complete)
 
@@ -118,6 +118,14 @@ class Stats
 		invariant
 
 		topten
+	end
+	
+	def serialize_item(item)
+		return Marshal::dump(item)
+	end
+	
+	def deserialize_item(item_string)
+		return Marshal::load(item_string)
 	end
 
 end
