@@ -157,8 +157,8 @@ class Server
 	end
 
     def column_press(room_id, column, token)
-        #invariant 
-        #pre_take_turn(room_id, game_obj)
+        invariant 
+        pre_take_turn(room_id, game_obj)
         puts "made it"
         room = @rooms[room_id]
         game_obj = room.game
@@ -185,15 +185,19 @@ class Server
             game_over(room_id)
         end
 
-        #post_take_turn
-        #invariant
+        post_take_turn
+        invariant
     end
 	
 	def game_over(room_id)
+		invariant
+		pre_game_over
 		#remove room from list of rooms
 		@rooms.delete(room_id)
 		#there is no need to tell the clients, they handle the game 
 		#ending with their version of game
+		post_game_over(room_id)
+		invariant
 	end
 	
 	def save_game()

@@ -49,17 +49,23 @@ module ServerContracts
 	end
 
 
-	def pre_column_press(room_number)
+	def pre_column_press
 		# room_number
-		raise "RoomError, Current room must exist within the range of rooms" unless room_number.between?(0, @rooms.size-1)
-
+		
 		# game obj 
 		#raise "Server error, game object must be of type Game" unless game_obj.is_a? Game
 	end 
 	def post_column_press
 		# no contracts
 	end 
-
+	
+	def pre_game_over
+		# none
+	end
+	
+	def post_game_over(room_id)
+		raise "Room not deleted" unless !@rooms.key?(room_id)
+	end
 
 
 end
