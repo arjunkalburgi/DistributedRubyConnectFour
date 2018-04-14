@@ -3,13 +3,13 @@ module StatsContracts
     def invariant
     end
 
-    def pre_initialize(host, user, password)
+    def pre_initialize(host, username, password)
         raise "Database Creation Error, host must be String" unless host.is_a? String
         raise "Database Creation Error, username must be String" unless username.is_a? String
         raise "Database Creation Error, password must be String" unless password.is_a? String
     end
 
-    def post_initialize(connection)
+    def post_initialize
         raise "Database Error, no db connection" unless !@connection.nil?
     end
 
